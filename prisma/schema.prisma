@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(50)
+  email     String   @db.VarChar(100)
+  message   String   @db.Text
+  status    ContactStatus @default(UNREAD) // Track message status
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ContactStatus {
+  UNREAD
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+model Project {
+  id              String   @id @default(uuid())
+  title           String   @db.VarChar(100)  // Project title
+  description     String   @db.Text          // Short description
+  link            String   @db.VarChar(255)  // Project link
+  image           String   @db.VarChar(255)  // Image URL
+  githubUrl       String?  @db.VarChar(255)  // Optional GitHub repository URL
+  liveUrl         String?  @db.VarChar(255)  // Optional live demo URL
+  technologies    String[] // Array of technologies used
+  category        ProjectCategory @default(WEB) // Project category
+  featured        Boolean  @default(false)    // Whether to feature project
+  date            DateTime @default(now())    // Project completion date
+  order           Int      @default(0)        // Display order
+  createdAt       DateTime @default(now())    // Timestamp for creation
+  updatedAt       DateTime @updatedAt         // Auto-updated timestamp
+}
+
+enum ProjectCategory {
+  WEB
+  MOBILE
+  BACKEND
+  OTHER
+}
+
+model Experience {
+  id          String   @id @default(uuid())
+  company     String   @db.VarChar(100)  // Company name
+  location    String   @db.VarChar(100)  // Company location
+  startDate   DateTime // Start date
+  endDate     DateTime? // End date (null if current)
+  isCurrent   Boolean  @default(false)   // If this is current position
+  title       String   @db.VarChar(100)  // Job title
+  description String   @db.Text          // Job description
+  roles       String[] // Array of key responsibilities
+  skills      String[] // Skills used/gained
+  order       Int      @default(0)      // Display order
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Service {
+  id           String   @id @default(uuid())
+  title        String   @db.VarChar(100) // Service title
+  description  String   @db.Text         // Service description
+  icon         String   @db.VarChar(50)  // Icon name (from Lucide)
+  color        String   @db.VarChar(50)  // Color theme
+  technologies String[] // Array of related technologies/tags
+  order        Int      @default(0)      // Display order
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SocialLink {
+  id        String   @id @default(uuid())
+  platform  String   @db.VarChar(50)  // Platform name
+  url       String   @db.VarChar(255) // URL to profile
+  icon      String   @db.VarChar(50)  // Icon name
+  order     Int      @default(0)      // Display order
+  isActive  Boolean  @default(true)   // If link is active
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id              String   @id @default(uuid())
+  name            String   @db.VarChar(100)
+  title           String   @db.VarChar(100) // Professional title
+  email           String   @db.VarChar(100)
+  phone           String?  @db.VarChar(20)
+  location        String?  @db.VarChar(100)
+  bio             String   @db.Text
+  resumeUrl       String?  @db.VarChar(255) // URL to resume file
+  profileImageUrl String?  @db.VarChar(255) // URL to profile image
+  skills          String[] // Array of skills
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// schema.prisma (add to your existing schema)
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String    @unique
+  password      String
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
