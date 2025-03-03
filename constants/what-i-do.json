@@ -1,0 +1,38 @@
+[
+    {
+      "title": "Full Stack Development",
+      "icon": "Code",
+      "description": "Building scalable web applications with modern frameworks like Next.js, React, and Node.js."
+    },
+    {
+      "title": "React Native App Development",
+      "icon": "Smartphone",
+      "description": "Creating high-performance cross-platform mobile apps using React Native and Expo."
+    },
+    {
+      "title": "UI/UX & Frontend Development",
+      "icon": "Layout",
+      "description": "Designing sleek, user-friendly interfaces with Tailwind CSS and advanced UI frameworks."
+    },
+    {
+      "title": "Backend & Database Management",
+      "icon": "Database",
+      "description": "Developing secure and optimized backends using Prisma, MySQL, MongoDB, and Express.js."
+    },
+    {
+      "title": "API Development & Integration",
+      "icon": "Link",
+      "description": "Building RESTful and GraphQL APIs to integrate with various services and third-party platforms."
+    },
+    {
+      "title": "Cloud Deployment & DevOps",
+      "icon": "Cloud",
+      "description": "Deploying applications with Vercel, AWS, and Docker for high availability and performance."
+    },
+    {
+      "title": "AI & Machine Learning Integration",
+      "icon": "Brain",
+      "description": "Enhancing applications with AI-driven solutions, automation, and ML models."
+    }
+  ]
+  
