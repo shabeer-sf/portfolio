@@ -1,5 +1,5 @@
-// actions/admin/contact.js
 "use server";
+// actions/admin/contact.js
 
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
