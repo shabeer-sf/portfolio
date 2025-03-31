@@ -1,4 +1,5 @@
 import ContactForm from "@/components/ContactForm";
+import Footer from "@/components/Footer";
 import HeroPage from "@/components/HeroPage";
 import Navbar from "@/components/Navbar";
 import Projects from "@/components/Projects";
@@ -14,6 +15,7 @@ const MainPage = () => {
       <Timeline />
       <Projects />
       <ContactForm />
+      <Footer />
     </main>
   );
 };

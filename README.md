@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Shabeer Portfolio - Full Stack & React Native Developer
+
+A modern, responsive portfolio website built with Next.js, Tailwind CSS, and shadcn/ui components showcasing my skills, projects, and professional experience.
+
+![Shabeer Portfolio](https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg)
+
+## Features
+
+- 🌗 Sleek dark theme design with gradient accents
+- 🖼️ Responsive layout for all device sizes
+- ✨ Smooth animations and transitions using Framer Motion
+- 🧩 Modular component architecture
+- 📊 PostgreSQL database integration with Prisma ORM
+- 📱 Mobile-first approach
+- 🚀 Performance optimized with Next.js App Router
+- 📋 Contact form with server actions
+
+## Technologies
+
+- **Frontend:**
+  - Next.js 14 (App Router)
+  - React 18
+  - Tailwind CSS
+  - shadcn/ui Components
+  - Framer Motion
+  - Lucide Icons
+  - Swiper
+
+- **Backend:**
+  - Next.js Server Actions
+  - Prisma ORM
+  - PostgreSQL
+  - Zod Validation
+
+## Sections
+
+- Hero section with introduction and tech stack slider
+- Services offered (Full Stack, React Native, etc.)
+- Professional experience timeline
+- Featured projects with filtering
+- Contact form with validation
+- Footer with navigation and social links
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 16.8 or later
+- npm, yarn, or pnpm
+- PostgreSQL database
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/shabeer-portfolio.git
+   cd shabeer-portfolio
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
+
+3. Set up your environment variables:
+   ```
+   # Create a .env file with the following variables
+   DATABASE_URL="postgresql://username:password@localhost:5432/portfolio_db"
+   ```
+
+4. Run Prisma migrations:
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   ```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+
+## Database Schema
+
+The portfolio uses a PostgreSQL database with the following models:
+- Contact: Stores messages from the contact form
+- Project: Displays portfolio projects
+- Experience: Shows work history and professional experience
+- Service: Lists services offered
+- SocialLink: Manages social media links
+- Profile: Stores personal information
+- User: Handles authentication for the admin area
+
+## Deployment
+
+This project is optimized for deployment on Vercel:
 
 ```bash
-npm run dev
+npm run build
 # or
-yarn dev
+yarn build
 # or
-pnpm dev
-# or
-bun dev
+pnpm build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## License
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+MIT
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contact
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For inquiries, please reach out via the contact form on the website or email directly at shabeersggs@gmail.com.
