@@ -70,6 +70,8 @@ A modern, responsive portfolio website built with Next.js, Tailwind CSS, and sha
    ```
    # Create a .env file with the following variables
    DATABASE_URL="postgresql://username:password@localhost:5432/portfolio_db"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-nextauth-secret-here" # Generate a secure random string
    ```
 
 4. Run Prisma migrations:
@@ -77,7 +79,17 @@ A modern, responsive portfolio website built with Next.js, Tailwind CSS, and sha
    npx prisma migrate dev
    ```
 
-5. Start the development server:
+5. Seed the admin user:
+   ```bash
+   npm run seed-admin
+   # or
+   yarn seed-admin
+   # or
+   pnpm seed-admin
+   ```
+   This will create an admin user with email `admin@example.com` and password `Admin123!`
+
+6. Start the development server:
    ```bash
    npm run dev
    # or
@@ -86,7 +98,9 @@ A modern, responsive portfolio website built with Next.js, Tailwind CSS, and sha
    pnpm dev
    ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+7. Open [http://localhost:3000](http://localhost:3000) in your browser to see the public portfolio.
+   
+8. Access the admin panel at [http://localhost:3000/admin](http://localhost:3000/admin) using the admin credentials.
 
 ## Database Schema
 
@@ -98,6 +112,44 @@ The portfolio uses a PostgreSQL database with the following models:
 - SocialLink: Manages social media links
 - Profile: Stores personal information
 - User: Handles authentication for the admin area
+
+## Admin Dashboard
+
+The portfolio includes a complete admin dashboard that allows you to:
+
+### Messages Management
+- View all contact messages with status indicators
+- Filter messages by status (Unread, Read, Replied, Archived)
+- Update message status
+- Delete messages
+
+### Projects Management
+- Create new projects
+- Edit existing projects
+- Toggle featured status
+- Delete projects
+- Manage project details (title, description, image, links, technologies)
+- Set project ordering
+
+### Experience Management
+- Add new work experiences
+- Edit existing experiences
+- Set current position status
+- Manage experience details (company, location, dates, description, roles, skills)
+- Delete experiences
+
+### Security
+- Protected routes using NextAuth.js
+- Admin-only access
+- Role-based authentication
+- Secure password storage with bcrypt
+
+### UI/UX
+- Matching design system with the frontend
+- Dark theme interface
+- Responsive layouts
+- Interactive components
+- Real-time notifications using Sonner toasts
 
 ## Deployment
 

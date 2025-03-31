@@ -9,30 +9,55 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Github, Code, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
-  const fetchProjects = async () => {
-    try {
-      setIsLoading(true);
-      const project = await getProjects2();
-      setProjects(project);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
+  // Define category mapping for filtering
+  const categoryMapping = {
+    "web": "WEB",
+    "mobile": "MOBILE",
+    "backend": "BACKEND",
+    "other": "OTHER"
   };
 
+  // Fetch projects on component mount
   useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setIsLoading(true);
+        // Fetch all projects
+        const fetchedProjects = await getProjects2();
+        setProjects(fetchedProjects);
+        setFilteredProjects(fetchedProjects);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchProjects();
   }, []);
 
-  // Filter categories - you can adapt these based on your project types
-  const categories = ["all", "web", "mobile", "backend"];
+  // Filter projects when filter state changes
+  useEffect(() => {
+    if (filter === "all") {
+      setFilteredProjects(projects);
+    } else {
+      const filtered = projects.filter(
+        project => project.category === categoryMapping[filter]
+      );
+      setFilteredProjects(filtered);
+    }
+  }, [filter, projects]);
+
+  // Filter categories - based on your project types
+  const categories = ["all", "web", "mobile", "backend", "other"];
 
   // Animation variants
   const containerVariants = {
@@ -129,83 +154,99 @@ const Projects = () => {
                     </CardContent>
                   </Card>
                 ))
-            : projects?.length > 0 &&
-              projects.map((project, index) => (
-                <motion.div key={index} variants={itemVariants}>
-                  <Card className="h-full bg-[#1c1c1c] border-slate-800 overflow-hidden hover:shadow-lg hover:shadow-slate-900/50 transition-all duration-300 hover:-translate-y-1">
-                    <CardContent className="p-0">
-                      {/* Project Image */}
-                      <div className="relative w-full h-52 group">
-                        <Image
-                          src={project.image}
-                          alt={project.title}
-                          fill
-                          className="object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-300">
-                          <Button size="sm" asChild variant="outline" className="border-white/20 bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-                            <Link href={project.liveUrl || project.link} target="_blank">
-                              <Eye size={16} className="mr-1" /> Live Demo
-                            </Link>
-                          </Button>
-                          {project.githubUrl && (
-                            <Button size="sm" asChild variant="outline" className="border-white/20 bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-                              <Link href={project.githubUrl} target="_blank">
-                                <Github size={16} className="mr-1" /> Code
-                              </Link>
-                            </Button>
-                          )}
+            : filteredProjects.length > 0 ? (
+                filteredProjects.map((project, index) => (
+                  <motion.div key={project.id} variants={itemVariants}>
+                    <Card className="h-full bg-[#1c1c1c] border-slate-800 overflow-hidden hover:shadow-lg hover:shadow-slate-900/50 transition-all duration-300 hover:-translate-y-1">
+                      <CardContent className="p-0">
+                        {/* Project Image */}
+                        <div className="relative w-full h-52 group">
+                          <Image
+                            src={project.image}
+                            alt={project.title}
+                            fill
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-300">
+                            {(project.liveUrl || project.link) && (
+                              <Button size="sm" asChild variant="outline" className="border-white/20 bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+                                <Link href={project.liveUrl || project.link} target="_blank">
+                                  <Eye size={16} className="mr-1" /> Live Demo
+                                </Link>
+                              </Button>
+                            )}
+                            {project.githubUrl && (
+                              <Button size="sm" asChild variant="outline" className="border-white/20 bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+                                <Link href={project.githubUrl} target="_blank">
+                                  <Github size={16} className="mr-1" /> Code
+                                </Link>
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="p-5">
-                        <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
-                        <p className="text-slate-400 text-sm mb-4">{project.description}</p>
                         
-                        {/* Technologies */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {project.technologies ? (
-                            project.technologies.map((tech, techIndex) => (
-                              <Badge key={techIndex} variant="secondary" className="bg-slate-800/50 text-slate-300">
-                                {tech}
+                        {/* Content */}
+                        <div className="p-5">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="text-xl font-bold text-white">{project.title}</h3>
+                            {project.featured && (
+                              <Badge className="bg-amber-500/10 text-amber-400 ml-2">
+                                Featured
                               </Badge>
-                            ))
-                          ) : (
-                            // Default badges if tech stack is not available
-                            <>
-                              <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">React</Badge>
-                              <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">Next.js</Badge>
-                              <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">Tailwind</Badge>
-                            </>
-                          )}
+                            )}
+                          </div>
+                          <p className="text-slate-400 text-sm mb-4 line-clamp-2">{project.description}</p>
+                          
+                          {/* Technologies */}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {project.technologies && project.technologies.length > 0 ? (
+                              project.technologies.slice(0, 4).map((tech, techIndex) => (
+                                <Badge key={techIndex} variant="secondary" className="bg-slate-800/50 text-slate-300">
+                                  {tech}
+                                </Badge>
+                              ))
+                            ) : (
+                              <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">
+                                {project.category}
+                              </Badge>
+                            )}
+                            {project.technologies && project.technologies.length > 4 && (
+                              <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">
+                                +{project.technologies.length - 4}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="bg-slate-900/30 border-t border-slate-800 flex justify-between p-4">
-                      <span className="text-xs text-slate-500">
-                        {project.date || "2024"}
-                      </span>
-                      <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-white p-0">
-                        <Link href={project.link} target="_blank">
-                          View Details <ExternalLink size={14} className="ml-1" />
-                        </Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
+                      </CardContent>
+                      <CardFooter className="bg-slate-900/30 border-t border-slate-800 flex justify-between p-4">
+                        <span className="text-xs text-slate-500">
+                          {project.date ? format(new Date(project.date), "MMM yyyy") : "2024"}
+                        </span>
+                        <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-white p-0">
+                          <Link href={project.link} target="_blank">
+                            View Details <ExternalLink size={14} className="ml-1" />
+                          </Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20">
+                  <p className="text-slate-400">No projects found for this category</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
+                    onClick={() => setFilter("all")}
+                  >
+                    View All Projects
+                  </Button>
+                </div>
+              )}
         </motion.div>
         
-        {/* Show message if no projects loaded */}
-        {!isLoading && projects?.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-slate-400">No projects found</p>
-          </div>
-        )}
-        
         {/* View all projects button */}
-        {projects?.length > 0 && (
+        {!isLoading && filteredProjects.length > 0 && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

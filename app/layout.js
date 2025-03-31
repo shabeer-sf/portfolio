@@ -1,6 +1,8 @@
+// app/layout.js
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import AuthProvider from "@/components/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,10 +35,7 @@ export const metadata = {
   generator: "Next.js",
   applicationName: "Shabeer Portfolio",
   robots: "index, follow",
-  
-  
 };
-
 
 export default function RootLayout({ children }) {
   return (
@@ -44,8 +43,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary text-white`}
       >
-        <Toaster richColors />
-        {children}
+        <AuthProvider>
+          <Toaster richColors />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
