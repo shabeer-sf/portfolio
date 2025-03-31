@@ -1,17 +1,20 @@
 // app/admin/messages/page.jsx
-import React from "react";
-import Link from "next/link";
-import { format } from "date-fns";
-import { getContacts, getContactCount } from "@/actions/admin/contact";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { getContactCount, getContacts } from "@/actions/admin/contact";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Select,
   SelectContent,
@@ -27,16 +30,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { format } from "date-fns";
 import { Eye, Filter, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import Link from "next/link";
+export const dynamic = 'force-dynamic';
 
 // Metadata
 export const metadata = {
@@ -72,11 +69,7 @@ function StatusBadge({ status }) {
         </Badge>
       );
     default:
-      return (
-        <Badge className="bg-slate-500/10 text-slate-400">
-          {status}
-        </Badge>
-      );
+      return <Badge className="bg-slate-500/10 text-slate-400">{status}</Badge>;
   }
 }
 
@@ -85,7 +78,7 @@ export default async function MessagesPage({ searchParams }) {
   const page = parseInt(searchParams.page) || 1;
   const limit = parseInt(searchParams.limit) || 10;
   const status = searchParams.status || null;
-  
+
   // Fetch contacts with pagination
   const contacts = await getContacts({
     page,
@@ -94,7 +87,7 @@ export default async function MessagesPage({ searchParams }) {
     sortBy: "createdAt",
     sortOrder: "desc",
   });
-  
+
   // Fetch total count for pagination
   const totalCount = await getContactCount(status);
   const totalPages = Math.ceil(totalCount / limit);
@@ -126,11 +119,21 @@ export default async function MessagesPage({ searchParams }) {
               </div>
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-700 text-white">
-              <SelectItem value="all" className="text-white">All Messages</SelectItem>
-              <SelectItem value="UNREAD" className="text-blue-400">Unread</SelectItem>
-              <SelectItem value="READ" className="text-purple-400">Read</SelectItem>
-              <SelectItem value="REPLIED" className="text-green-400">Replied</SelectItem>
-              <SelectItem value="ARCHIVED" className="text-slate-400">Archived</SelectItem>
+              <SelectItem value="all" className="text-white">
+                All Messages
+              </SelectItem>
+              <SelectItem value="UNREAD" className="text-blue-400">
+                Unread
+              </SelectItem>
+              <SelectItem value="READ" className="text-purple-400">
+                Read
+              </SelectItem>
+              <SelectItem value="REPLIED" className="text-green-400">
+                Replied
+              </SelectItem>
+              <SelectItem value="ARCHIVED" className="text-slate-400">
+                Archived
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -143,23 +146,33 @@ export default async function MessagesPage({ searchParams }) {
             <Table>
               <TableHeader className="bg-slate-900/50">
                 <TableRow className="border-slate-800 hover:bg-transparent">
-                  <TableHead className="text-slate-400 w-[200px]">Name</TableHead>
+                  <TableHead className="text-slate-400 w-[200px]">
+                    Name
+                  </TableHead>
                   <TableHead className="text-slate-400">Message</TableHead>
-                  <TableHead className="text-slate-400 w-[120px]">Status</TableHead>
-                  <TableHead className="text-slate-400 w-[150px]">Date</TableHead>
-                  <TableHead className="text-slate-400 w-[100px] text-right">Actions</TableHead>
+                  <TableHead className="text-slate-400 w-[120px]">
+                    Status
+                  </TableHead>
+                  <TableHead className="text-slate-400 w-[150px]">
+                    Date
+                  </TableHead>
+                  <TableHead className="text-slate-400 w-[100px] text-right">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {contacts.map((contact) => (
-                  <TableRow 
-                    key={contact.id} 
+                  <TableRow
+                    key={contact.id}
                     className="border-slate-800 hover:bg-slate-800/50"
                   >
                     <TableCell className="font-medium text-white">
                       <div className="space-y-1">
                         <div>{contact.name}</div>
-                        <div className="text-xs text-slate-400">{contact.email}</div>
+                        <div className="text-xs text-slate-400">
+                          {contact.email}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-slate-300">
@@ -175,7 +188,12 @@ export default async function MessagesPage({ searchParams }) {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" asChild className="text-slate-400 hover:text-white h-8 px-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                        className="text-slate-400 hover:text-white h-8 px-2"
+                      >
                         <Link href={`/admin/messages/${contact.id}`}>
                           <Eye size={14} className="mr-1" /> View
                         </Link>
@@ -198,27 +216,45 @@ export default async function MessagesPage({ searchParams }) {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
-                href={page > 1 ? `/admin/messages?page=${page - 1}${status ? `&status=${status}` : ''}` : '#'} 
+              <PaginationPrevious
+                href={
+                  page > 1
+                    ? `/admin/messages?page=${page - 1}${
+                        status ? `&status=${status}` : ""
+                      }`
+                    : "#"
+                }
                 className={page <= 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
-            
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <PaginationItem key={pageNum}>
-                <PaginationLink 
-                  href={`/admin/messages?page=${pageNum}${status ? `&status=${status}` : ''}`}
-                  isActive={pageNum === page}
-                >
-                  {pageNum}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+              (pageNum) => (
+                <PaginationItem key={pageNum}>
+                  <PaginationLink
+                    href={`/admin/messages?page=${pageNum}${
+                      status ? `&status=${status}` : ""
+                    }`}
+                    isActive={pageNum === page}
+                  >
+                    {pageNum}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            )}
+
             <PaginationItem>
-              <PaginationNext 
-                href={page < totalPages ? `/admin/messages?page=${page + 1}${status ? `&status=${status}` : ''}` : '#'} 
-                className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
+              <PaginationNext
+                href={
+                  page < totalPages
+                    ? `/admin/messages?page=${page + 1}${
+                        status ? `&status=${status}` : ""
+                      }`
+                    : "#"
+                }
+                className={
+                  page >= totalPages ? "pointer-events-none opacity-50" : ""
+                }
               />
             </PaginationItem>
           </PaginationContent>
