@@ -3,9 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ProjectForm from "../project-form";
+import ProjectForm from "@/components/ProjectForm";
 import { getProject } from "@/actions/admin/project";
-import DeleteProjectButton from "./delete-button";
+import DeleteProjectButton from "../_components/delete-button";
 
 export async function generateMetadata({ params }) {
   try {
