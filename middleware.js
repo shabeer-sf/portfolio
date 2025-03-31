@@ -1,45 +1,40 @@
 // middleware.js
-import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default withAuth(
-  function middleware(req) {
-    // Get the pathname and token
-    const { pathname } = req.nextUrl;
-    const token = req.nextauth?.token;
-    
-    // Check if it's an admin route but not the login page
-    const isAdminRoute = pathname.startsWith("/admin");
-    const isLoginPage = pathname === "/admin/login";
-    
-    // If trying to access admin route (except login) but not an admin
-    if (isAdminRoute && !isLoginPage && (!token || token?.role !== "ADMIN")) {
-      const url = new URL("/admin/login", req.url);
-      return NextResponse.redirect(url);
-    }
-    
-    // If trying to access login page but already authenticated as admin, redirect to admin dashboard
-    if (isLoginPage && token?.role === "ADMIN") {
-      const url = new URL("/admin", req.url);
-      return NextResponse.redirect(url);
-    }
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        // Allow access to login page without authentication
-        if (req.nextUrl.pathname === "/admin/login") {
-          return true;
-        }
-        
-        // For other admin routes, require authentication
-        return !!token;
-      },
-    },
+export async function middleware(request) {
+  const { pathname } = request.nextUrl;
+  
+  // Skip middleware for non-admin routes and api routes
+  if (!pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+    return NextResponse.next();
   }
-);
+  
+  // Skip middleware for login page
+  if (pathname === '/admin/login') {
+    return NextResponse.next();
+  }
 
-// Specify routes that should be protected
+  // Get the user token
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.NEXTAUTH_SECRET 
+  });
+
+  // Check if the user is authenticated and has admin role
+  const isAuthenticated = !!token;
+  const isAdmin = token?.role === "ADMIN";
+
+  // If not authenticated or not an admin, redirect to login
+  if (!isAuthenticated || !isAdmin) {
+    const url = new URL('/admin/login', request.url);
+    return NextResponse.redirect(url);
+  }
+
+  // Allow the request to continue
+  return NextResponse.next();
+}
+
 export const config = {
-  matcher: ["/admin", "/admin/:path*"],
+  matcher: ['/admin/:path*'],
 };

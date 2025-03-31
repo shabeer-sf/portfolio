@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { signOut } from "next-auth/react";
+import AdminWrapper from "@/components/AdminWrapper";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
@@ -76,7 +77,8 @@ export default function AdminLayout({ children }) {
   ];
 
   return (
-    <div className="flex h-screen bg-[#121212]">
+    <AdminWrapper>
+        <div className="flex h-screen bg-[#121212]">
       {/* Sidebar */}
       <div className="w-64 bg-[#1c1c1c] border-r border-slate-800 h-full flex flex-col">
         <div className="p-6">
@@ -140,5 +142,6 @@ export default function AdminLayout({ children }) {
         <main className="h-full">{children}</main>
       </div>
     </div>
+    </AdminWrapper>
   );
 }
