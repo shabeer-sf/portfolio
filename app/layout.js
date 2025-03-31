@@ -42,6 +42,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary text-white`}
+        suppressHydrationWarning // ✅ This prevents React from throwing hydration errors
       >
         <AuthProvider>
           <Toaster richColors />
