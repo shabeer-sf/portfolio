@@ -71,8 +71,15 @@ export default function ExperienceForm({ experience }) {
     },
   });
 
-  // Watch isCurrent field to enable/disable end date
+  // Watch isCurrent field to enable/disable end date and update endDate field
   const watchIsCurrent = form.watch('isCurrent');
+  
+  // Update endDate when isCurrent changes
+  useEffect(() => {
+    if (watchIsCurrent) {
+      form.setValue('endDate', null);
+    }
+  }, [watchIsCurrent, form]);
 
   // Update roles and skills fields when their state changes
   useEffect(() => {
@@ -85,6 +92,11 @@ export default function ExperienceForm({ experience }) {
     setIsLoading(true);
     
     try {
+      // Make sure endDate is null if isCurrent is true
+      if (data.isCurrent) {
+        data.endDate = null;
+      }
+      
       if (experience) {
         // Update existing experience
         await updateExperience(experience.id, data);
@@ -103,7 +115,7 @@ export default function ExperienceForm({ experience }) {
       router.refresh();
     } catch (error) {
       console.error('Error saving experience:', error);
-      toast.error('Failed to save experience');
+      toast.error('Failed to save experience: ' + (error.message || 'Unknown error'));
     } finally {
       setIsLoading(false);
     }
@@ -277,7 +289,13 @@ export default function ExperienceForm({ experience }) {
                     <FormControl>
                       <Switch
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                          // Clear end date if current position is checked
+                          if (checked) {
+                            form.setValue('endDate', null);
+                          }
+                        }}
                       />
                     </FormControl>
                   </FormItem>
@@ -391,25 +409,29 @@ export default function ExperienceForm({ experience }) {
             <div>
               <FormLabel className="text-slate-300">Key Responsibilities</FormLabel>
               <div className="flex flex-wrap gap-2 my-3">
-                {roles.map((role, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="bg-slate-800 text-slate-300 flex items-center gap-1"
-                  >
-                    {role}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-4 w-4 p-0 hover:bg-transparent"
-                      onClick={() => handleRemoveRole(role)}
+                {roles.length > 0 ? (
+                  roles.map((role, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-slate-800 text-slate-300 flex items-center gap-1"
                     >
-                      <X size={12} />
-                      <span className="sr-only">Remove {role}</span>
-                    </Button>
-                  </Badge>
-                ))}
+                      {role}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 hover:bg-transparent"
+                        onClick={() => handleRemoveRole(role)}
+                      >
+                        <X size={12} />
+                        <span className="sr-only">Remove {role}</span>
+                      </Button>
+                    </Badge>
+                  ))
+                ) : (
+                  <div className="text-sm text-slate-500">No responsibilities added yet</div>
+                )}
               </div>
               <div className="flex gap-2">
                 <Input
@@ -443,25 +465,29 @@ export default function ExperienceForm({ experience }) {
             <div>
               <FormLabel className="text-slate-300">Skills Used/Gained</FormLabel>
               <div className="flex flex-wrap gap-2 my-3">
-                {skills.map((skill, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="bg-slate-800 text-slate-300 flex items-center gap-1"
-                  >
-                    {skill}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-4 w-4 p-0 hover:bg-transparent"
-                      onClick={() => handleRemoveSkill(skill)}
+                {skills.length > 0 ? (
+                  skills.map((skill, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-slate-800 text-slate-300 flex items-center gap-1"
                     >
-                      <X size={12} />
-                      <span className="sr-only">Remove {skill}</span>
-                    </Button>
-                  </Badge>
-                ))}
+                      {skill}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 hover:bg-transparent"
+                        onClick={() => handleRemoveSkill(skill)}
+                      >
+                        <X size={12} />
+                        <span className="sr-only">Remove {skill}</span>
+                      </Button>
+                    </Badge>
+                  ))
+                ) : (
+                  <div className="text-sm text-slate-500">No skills added yet</div>
+                )}
               </div>
               <div className="flex gap-2">
                 <Input
@@ -508,4 +534,4 @@ export default function ExperienceForm({ experience }) {
         </CardFooter>
       </form>
     </Form>
-  );
+  )};
