@@ -1,7 +1,6 @@
-// app/admin/login/page.jsx
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,11 +33,14 @@ const loginSchema = z.object({
   password: z.string().min(1, { message: "Password is required" }),
 });
 
-export default function LoginPage() {
+// Use this wrapper component to handle the useSearchParams hook
+function LoginFormWithSearchParams() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/admin";
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Get callbackUrl from search params
+  const callbackUrl = searchParams?.get("callbackUrl") || "/admin";
 
   // Initialize form
   const form = useForm({
@@ -68,13 +70,100 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (error) {
-      console.error("Login error:", error);
       toast.error("An error occurred. Please try again.");
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-slate-300">Email</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                  <Input
+                    placeholder="admin@example.com"
+                    type="email"
+                    className="bg-slate-800/50 border-slate-700 pl-10 text-white"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage className="text-red-400" />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-slate-300">Password</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                  <Input
+                    placeholder="••••••••"
+                    type="password"
+                    className="bg-slate-800/50 border-slate-700 pl-10 text-white"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage className="text-red-400" />
+            </FormItem>
+          )}
+        />
+
+        <Button
+          type="submit"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            "Sign In"
+          )}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+// Loading fallback component
+function LoginFormSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <div className="h-5 w-16 bg-slate-800 rounded animate-pulse"></div>
+        <div className="h-10 w-full bg-slate-800 rounded animate-pulse"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-5 w-20 bg-slate-800 rounded animate-pulse"></div>
+        <div className="h-10 w-full bg-slate-800 rounded animate-pulse"></div>
+      </div>
+      <div className="h-10 w-full bg-gradient-to-r from-blue-600/40 to-purple-600/40 rounded animate-pulse"></div>
+    </div>
+  );
+}
+
+// Main page component
+export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#121212] px-4">
       {/* Background elements */}
@@ -91,70 +180,9 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Email</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
-                        <Input
-                          placeholder="admin@example.com"
-                          type="email"
-                          className="bg-slate-800/50 border-slate-700 pl-10 text-white"
-                          disabled={isLoading}
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage className="text-red-400" />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
-                        <Input
-                          placeholder="••••••••"
-                          type="password"
-                          className="bg-slate-800/50 border-slate-700 pl-10 text-white"
-                          disabled={isLoading}
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage className="text-red-400" />
-                  </FormItem>
-                )}
-              />
-
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
-              </Button>
-            </form>
-          </Form>
+          <Suspense fallback={<LoginFormSkeleton />}>
+            <LoginFormWithSearchParams />
+          </Suspense>
         </CardContent>
         <CardFooter className="border-t border-slate-800 pt-4 text-xs text-slate-500 text-center">
           Authorized personnel only. This area is protected and monitored.
