@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
-function LoginFormWithSearchParams() {
+export default function LoginFormWithSearchParams() {
   const searchParams = useSearchParams();
   
   // ✅ Ensure searchParams is accessed inside useMemo
