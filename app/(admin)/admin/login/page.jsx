@@ -1,5 +1,5 @@
-// app/admin/login/page.jsx
 "use client";
+// app/admin/login/page.jsx
 
 import { useState, useCallback, Suspense } from "react";
 import { signIn } from "next-auth/react";
