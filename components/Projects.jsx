@@ -7,15 +7,19 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Github, Code, Eye } from "lucide-react";
+import { ExternalLink, Github, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
 const Projects = () => {
-  const [projects, setProjects] = useState([]);
-  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
+  const [displayedProjects, setDisplayedProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [showAll, setShowAll] = useState(false);
+  
+  // Initial projects to display
+  const initialDisplayCount = 6;
 
   // Define category mapping for filtering
   const categoryMapping = {
@@ -32,8 +36,7 @@ const Projects = () => {
         setIsLoading(true);
         // Fetch all projects
         const fetchedProjects = await getProjects2();
-        setProjects(fetchedProjects);
-        setFilteredProjects(fetchedProjects);
+        setAllProjects(fetchedProjects);
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {
@@ -44,19 +47,40 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
-  // Filter projects when filter state changes
+  // Filter and limit projects when filter changes or all projects loaded
   useEffect(() => {
+    if (allProjects.length === 0) return;
+    
+    let filtered = [];
+    
+    // Apply category filter
     if (filter === "all") {
-      setFilteredProjects(projects);
+      filtered = [...allProjects];
     } else {
-      const filtered = projects.filter(
+      filtered = allProjects.filter(
         project => project.category === categoryMapping[filter]
       );
-      setFilteredProjects(filtered);
     }
-  }, [filter, projects]);
+    
+    // Limit projects if not showing all
+    if (!showAll) {
+      setDisplayedProjects(filtered.slice(0, initialDisplayCount));
+    } else {
+      setDisplayedProjects(filtered);
+    }
+    
+    // Reset showAll when filter changes
+    if (!showAll) {
+      setShowAll(false);
+    }
+  }, [filter, allProjects, showAll]);
 
-  // Filter categories - based on your project types
+  // Handle "View All" button click
+  const handleViewAll = () => {
+    setShowAll(true);
+  };
+
+  // Filter categories based on your project types
   const categories = ["all", "web", "mobile", "backend", "other"];
 
   // Animation variants
@@ -80,6 +104,11 @@ const Projects = () => {
       },
     },
   };
+
+  // Calculate if there are more projects to show
+  const hasMoreProjects = filter === "all" 
+    ? allProjects.length > displayedProjects.length
+    : allProjects.filter(p => p.category === categoryMapping[filter]).length > displayedProjects.length;
 
   return (
     <section id="projects" className="py-24 relative">
@@ -114,7 +143,10 @@ const Projects = () => {
                 key={category}
                 variant={filter === category ? "default" : "outline"}
                 size="sm"
-                onClick={() => setFilter(category)}
+                onClick={() => {
+                  setFilter(category);
+                  setShowAll(false);
+                }}
                 className={`capitalize ${
                   filter === category 
                     ? "bg-slate-800 border-slate-700 text-white" 
@@ -134,119 +166,111 @@ const Projects = () => {
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {isLoading
-            ? Array(6)
-                .fill(null)
-                .map((_, index) => (
-                  <Card key={index} className="bg-[#1c1c1c] border-slate-800 overflow-hidden">
-                    <CardContent className="p-0">
-                      <Skeleton className="w-full h-52 rounded-none" />
-                      <div className="p-5">
-                        <Skeleton className="w-3/4 h-6 mb-2" />
-                        <Skeleton className="w-full h-4 mb-1" />
-                        <Skeleton className="w-5/6 h-4 mb-4" />
-                        <div className="flex gap-2 mb-4">
-                          <Skeleton className="w-16 h-6 rounded-full" />
-                          <Skeleton className="w-16 h-6 rounded-full" />
-                          <Skeleton className="w-16 h-6 rounded-full" />
-                        </div>
+          {isLoading ? (
+            // Loading skeletons
+            Array(6)
+              .fill(null)
+              .map((_, index) => (
+                <Card key={index} className="bg-[#1c1c1c] border-slate-800 overflow-hidden">
+                  <CardContent className="p-0">
+                    <Skeleton className="w-full h-52 rounded-none" />
+                    <div className="p-5">
+                      <Skeleton className="w-3/4 h-6 mb-2" />
+                      <Skeleton className="w-full h-4 mb-1" />
+                      <Skeleton className="w-5/6 h-4 mb-4" />
+                      <div className="flex gap-2 mb-4">
+                        <Skeleton className="w-16 h-6 rounded-full" />
+                        <Skeleton className="w-16 h-6 rounded-full" />
+                        <Skeleton className="w-16 h-6 rounded-full" />
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-            : filteredProjects.length > 0 ? (
-                filteredProjects.map((project, index) => (
-                  <motion.div key={project.id} variants={itemVariants}>
-                    <Card className="h-full bg-[#1c1c1c] border-slate-800 overflow-hidden hover:shadow-lg hover:shadow-slate-900/50 transition-all duration-300 hover:-translate-y-1">
-                      <CardContent className="p-0">
-                        {/* Project Image */}
-                        <div className="relative w-full h-52 group">
-                          <Image
-                            src={project.image}
-                            alt={project.title}
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-300">
-                            {(project.liveUrl || project.link) && (
-                              <Button size="sm" asChild variant="outline" className="border-white/20 bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-                                <Link href={project.liveUrl || project.link} target="_blank">
-                                  <Eye size={16} className="mr-1" /> Live Demo
-                                </Link>
-                              </Button>
-                            )}
-                            {project.githubUrl && (
-                              <Button size="sm" asChild variant="outline" className="border-white/20 bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-                                <Link href={project.githubUrl} target="_blank">
-                                  <Github size={16} className="mr-1" /> Code
-                                </Link>
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="p-5">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-xl font-bold text-white">{project.title}</h3>
-                            {project.featured && (
-                              <Badge className="bg-amber-500/10 text-amber-400 ml-2">
-                                Featured
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-slate-400 text-sm mb-4 line-clamp-2">{project.description}</p>
-                          
-                          {/* Technologies */}
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {project.technologies && project.technologies.length > 0 ? (
-                              project.technologies.slice(0, 4).map((tech, techIndex) => (
-                                <Badge key={techIndex} variant="secondary" className="bg-slate-800/50 text-slate-300">
-                                  {tech}
-                                </Badge>
-                              ))
-                            ) : (
-                              <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">
-                                {project.category}
-                              </Badge>
-                            )}
-                            {project.technologies && project.technologies.length > 4 && (
-                              <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">
-                                +{project.technologies.length - 4}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                      <CardFooter className="bg-slate-900/30 border-t border-slate-800 flex justify-between p-4">
-                        <span className="text-xs text-slate-500">
-                          {project.date ? format(new Date(project.date), "MMM yyyy") : "2024"}
-                        </span>
-                        <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-white p-0">
-                          <Link href={project.link} target="_blank">
-                            View Details <ExternalLink size={14} className="ml-1" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+          ) : displayedProjects.length > 0 ? (
+            // Display projects
+            displayedProjects.map((project) => (
+              <motion.div key={project.id} variants={itemVariants}>
+                <Card className="h-full bg-[#1c1c1c] border-slate-800 overflow-hidden hover:shadow-lg hover:shadow-slate-900/50 transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="p-0">
+                    {/* Project Image */}
+                    <div className="relative w-full h-52 group">
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-300">
+                        <Button size="sm" asChild variant="outline" className="border-white/20 bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+                          <Link href={project.liveUrl || project.link} target="_blank">
+                            <Eye size={16} className="mr-1" /> Live Demo
                           </Link>
                         </Button>
-                      </CardFooter>
-                    </Card>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20">
-                  <p className="text-slate-400">No projects found for this category</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
-                    onClick={() => setFilter("all")}
-                  >
-                    View All Projects
-                  </Button>
-                </div>
-              )}
+                        {project.githubUrl && (
+                          <Button size="sm" asChild variant="outline" className="border-white/20 bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+                            <Link href={project.githubUrl} target="_blank">
+                              <Github size={16} className="mr-1" /> Code
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="p-5">
+                      <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
+                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">{project.description}</p>
+                      
+                      {/* Technologies */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {project.technologies && project.technologies.length > 0 ? (
+                          project.technologies.map((tech, techIndex) => (
+                            <Badge key={techIndex} variant="secondary" className="bg-slate-800/50 text-slate-300">
+                              {tech}
+                            </Badge>
+                          ))
+                        ) : (
+                          // Default badges if tech stack is not available
+                          <>
+                            <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">React</Badge>
+                            <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">Next.js</Badge>
+                            <Badge variant="secondary" className="bg-slate-800/50 text-slate-300">Tailwind</Badge>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="bg-slate-900/30 border-t border-slate-800 flex justify-between p-4">
+                    <span className="text-xs text-slate-500">
+                      {project.date ? format(new Date(project.date), "MMM yyyy") : "2024"}
+                    </span>
+                    <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-white p-0">
+                      <Link href={project.link} target="_blank">
+                        View Details <ExternalLink size={14} className="ml-1" />
+                      </Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+            ))
+          ) : (
+            // No projects found
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20">
+              <p className="text-slate-400">No projects found for this category</p>
+              <Button 
+                variant="outline" 
+                className="mt-4 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
+                onClick={() => setFilter("all")}
+              >
+                Show All Categories
+              </Button>
+            </div>
+          )}
         </motion.div>
         
         {/* View all projects button */}
-        {!isLoading && filteredProjects.length > 0 && (
+        {!isLoading && hasMoreProjects && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -254,8 +278,12 @@ const Projects = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-center mt-12"
           >
-            <Button variant="outline" className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800">
-              View All Projects <ExternalLink size={16} className="ml-2" />
+            <Button 
+              variant="outline" 
+              className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
+              onClick={handleViewAll}
+            >
+              Show All Projects <ExternalLink size={16} className="ml-2" />
             </Button>
           </motion.div>
         )}

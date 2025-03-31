@@ -9,7 +9,8 @@
     "lint": "next lint",
     "seed-admin": "node scripts/seed-admin.js",
     "seed-projects": "node scripts/seed-projects.js",
-    "seed-all": "npm run seed-admin && npm run seed-projects"
+    "seed-experiences": "node scripts/seed-experiences.js",
+    "seed-all": "npm run seed-admin && npm run seed-projects && npm run seed-experiences"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",

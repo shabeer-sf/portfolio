@@ -1,36 +1,40 @@
-"use client"
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Building, Check } from "lucide-react";
-
-const experiences = [
-  {
-    year: "2024 - 2025",
-    company: "Doutya Private Limited",
-    location: "Bangalore, India",
-    roles: [
-      "Developed and maintained cross-platform mobile applications using Expo and React Native, ensuring seamless functionality and performance on both iOS and Android platforms.",
-      "Implemented and integrated various third-party services and APIs, such as Firebase, Google Maps, and payment gateways, to extend app functionality and provide a richer user experience.",
-      "Worked on Software-as-a-Service (SaaS) solutions, contributing to the digital transformation of businesses.",
-    ],
-    skills: ["React Native", "Expo", "Firebase", "SaaS", "API Integration"]
-  },
-  {
-    year: "2022 - 2024",
-    company: "Smartwebin Software Development Company",
-    location: "Cochin, India",
-    roles: [
-      "Optimized backend processes in PHP, reducing server response time by 30% and enhancing overall application performance.",
-      "Led a cross-functional team to successfully deliver a complex project, meeting all deadlines and exceeding client expectations.",
-      "Worked on full-service website and mobile app development projects, improving system efficiency and user experience.",
-    ],
-    skills: ["PHP", "Team Leadership", "Web Development", "Performance Optimization"]
-  },
-];
+import { format } from "date-fns";
+import { getTimeline } from "@/actions/experience";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Timeline = () => {
+  const [experiences, setExperiences] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getTimeline();
+        setExperiences(data);
+      } catch (error) {
+        console.error("Error fetching experiences:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExperiences();
+  }, []);
+
+  // Format date range (e.g., "2022 - 2024" or "2024 - Present")
+  const formatDateRange = (startDate, endDate, isCurrent) => {
+    const start = format(new Date(startDate), "yyyy");
+    const end = isCurrent ? "Present" : format(new Date(endDate), "yyyy");
+    return `${start} - ${end}`;
+  };
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -102,79 +106,130 @@ const Timeline = () => {
           {/* Main vertical timeline line */}
           <div className="absolute left-[28px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-600/30 via-purple-600/30 to-slate-600/30 ml-0.5 md:ml-0"></div>
 
-          {experiences.map((exp, index) => (
-            <motion.div 
-              key={index} 
-              variants={itemVariants}
-              className="mb-16 relative"
-            >
-              {/* Year circle marker */}
-              <div className="absolute left-0 w-14 h-14 rounded-full bg-[#1c1c1c] border border-slate-700 flex items-center justify-center shadow-lg z-10">
-                <Clock size={20} className="text-slate-400" />
-              </div>
-
-              {/* Experience content */}
-              <div className="ml-20 relative">
-                {/* Year badge */}
-                <motion.div variants={childVariants} className="mb-3">
-                  <Badge className="bg-slate-800 hover:bg-slate-800 text-slate-300 text-sm px-3 py-1">
-                    {exp.year}
-                  </Badge>
-                </motion.div>
-
-                {/* Company card */}
-                <motion.div variants={childVariants}>
+          {isLoading ? (
+            // Loading skeletons
+            Array(2).fill(null).map((_, index) => (
+              <div key={index} className="mb-16 relative">
+                <div className="absolute left-0 w-14 h-14 rounded-full bg-[#1c1c1c] border border-slate-700 shadow-lg"></div>
+                <div className="ml-20 relative">
+                  <Skeleton className="h-8 w-24 mb-3" />
                   <Card className="bg-[#1c1c1c] border-slate-800 overflow-hidden shadow-lg mb-4">
                     <CardContent className="p-0">
-                      <div className="p-6 border-b border-slate-800 flex items-start gap-3">
-                        <Building className="text-slate-400 mt-1" size={20} />
-                        <div>
-                          <h3 className="text-xl font-bold text-white mb-1">{exp.company}</h3>
-                          <p className="text-slate-400">{exp.location}</p>
-                        </div>
+                      <div className="p-6 border-b border-slate-800">
+                        <Skeleton className="h-7 w-48 mb-2" />
+                        <Skeleton className="h-5 w-32" />
                       </div>
-                      
-                      {/* Roles */}
-                      <div className="p-6 pt-4">
-                        <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider mb-3">Key Responsibilities</h4>
-                        <ul className="space-y-4">
-                          {exp.roles.map((role, idx) => (
-                            <motion.li 
-                              key={idx}
-                              initial={{ opacity: 0, x: -10 }}
-                              whileInView={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.1 * idx }}
-                              viewport={{ once: true }}
-                              className="flex items-start gap-3"
-                            >
-                              <div className="min-w-6 mt-1">
-                                <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                  <Check size={12} className="text-blue-400" />
-                                </div>
-                              </div>
-                              <p className="text-slate-300 text-sm">{role}</p>
-                            </motion.li>
-                          ))}
-                        </ul>
-                        
-                        {/* Skills */}
-                        <div className="mt-6">
-                          <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider mb-3">Technologies & Skills</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {exp.skills.map((skill, skillIdx) => (
-                              <Badge key={skillIdx} variant="secondary" className="bg-slate-800/50 hover:bg-slate-800 text-slate-300">
-                                {skill}
-                              </Badge>
-                            ))}
-                          </div>
+                      <div className="p-6">
+                        <Skeleton className="h-4 w-40 mb-4" />
+                        <div className="space-y-4">
+                          <Skeleton className="h-16 w-full" />
+                          <Skeleton className="h-16 w-full" />
+                          <Skeleton className="h-16 w-full" />
+                        </div>
+                        <Skeleton className="h-4 w-40 mt-6 mb-4" />
+                        <div className="flex gap-2">
+                          <Skeleton className="h-6 w-20 rounded-full" />
+                          <Skeleton className="h-6 w-20 rounded-full" />
+                          <Skeleton className="h-6 w-20 rounded-full" />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
-          ))}
+            ))
+          ) : experiences.length > 0 ? (
+            experiences.map((exp, index) => (
+              <motion.div 
+                key={exp.id || index} 
+                variants={itemVariants}
+                className="mb-16 relative"
+              >
+                {/* Year circle marker */}
+                <div className="absolute left-0 w-14 h-14 rounded-full bg-[#1c1c1c] border border-slate-700 flex items-center justify-center shadow-lg z-10">
+                  <Clock size={20} className="text-slate-400" />
+                </div>
+
+                {/* Experience content */}
+                <div className="ml-20 relative">
+                  {/* Year badge */}
+                  <motion.div variants={childVariants} className="mb-3">
+                    <Badge className="bg-slate-800 hover:bg-slate-800 text-slate-300 text-sm px-3 py-1">
+                      {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
+                    </Badge>
+                  </motion.div>
+
+                  {/* Company card */}
+                  <motion.div variants={childVariants}>
+                    <Card className="bg-[#1c1c1c] border-slate-800 overflow-hidden shadow-lg mb-4">
+                      <CardContent className="p-0">
+                        <div className="p-6 border-b border-slate-800 flex items-start gap-3">
+                          <Building className="text-slate-400 mt-1" size={20} />
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-1">{exp.company}</h3>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                              <p className="text-slate-400">{exp.location}</p>
+                              {exp.title && (
+                                <>
+                                  <span className="hidden sm:inline text-slate-600">•</span>
+                                  <p className="text-blue-400">{exp.title}</p>
+                                </>
+                              )}
+                              {exp.isCurrent && (
+                                <Badge variant="outline" className="w-fit border-green-500/20 text-green-400 mt-1 sm:mt-0">
+                                  Current
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Roles */}
+                        <div className="p-6 pt-4">
+                          <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider mb-3">Key Responsibilities</h4>
+                          <ul className="space-y-4">
+                            {exp.roles.map((role, idx) => (
+                              <motion.li 
+                                key={idx}
+                                initial={{ opacity: 0, x: -10 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.1 * idx }}
+                                viewport={{ once: true }}
+                                className="flex items-start gap-3"
+                              >
+                                <div className="min-w-6 mt-1">
+                                  <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                    <Check size={12} className="text-blue-400" />
+                                  </div>
+                                </div>
+                                <p className="text-slate-300 text-sm">{role}</p>
+                              </motion.li>
+                            ))}
+                          </ul>
+                          
+                          {/* Skills */}
+                          <div className="mt-6">
+                            <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider mb-3">Technologies & Skills</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {exp.skills.map((skill, skillIdx) => (
+                                <Badge key={skillIdx} variant="secondary" className="bg-slate-800/50 hover:bg-slate-800 text-slate-300">
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-slate-400">No experience data found</p>
+            </div>
+          )}
         </motion.div>
       </div>
     </section>
