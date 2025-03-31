@@ -8,8 +8,18 @@ import { getExperience } from "@/actions/admin/experience";
 import DeleteExperienceButton from "../_components/delete-button";
 
 export async function generateMetadata({ params }) {
+  // Declare id variable safely from params
+  const id = params?.id;
+  
+  if (!id) {
+    return {
+      title: "Edit Experience | Admin Dashboard",
+      description: "Edit work experience details",
+    };
+  }
+  
   try {
-    const experience = await getExperience(params.id);
+    const experience = await getExperience(id);
     return {
       title: `Edit ${experience.title} at ${experience.company} | Admin Dashboard`,
       description: `Edit work experience details`,
@@ -23,10 +33,17 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function EditExperiencePage({ params }) {
+  // Safely extract id from params
+  const id = params?.id;
+  
+  if (!id) {
+    notFound();
+  }
+  
   let experience;
   
   try {
-    experience = await getExperience(params.id);
+    experience = await getExperience(id);
   } catch (error) {
     notFound();
   }

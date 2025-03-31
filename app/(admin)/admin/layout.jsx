@@ -5,14 +5,14 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { 
-  LayoutDashboard, 
-  Mail, 
-  Briefcase, 
-  FolderKanban, 
-  UserCircle, 
-  Settings, 
-  LogOut 
+import {
+  LayoutDashboard,
+  Mail,
+  Briefcase,
+  FolderKanban,
+  UserCircle,
+  Settings,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -22,7 +22,7 @@ import AdminWrapper from "@/components/AdminWrapper";
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  
+
   // If not authenticated and not on login page, show loading
   if (status === "loading") {
     return (
@@ -77,8 +77,7 @@ export default function AdminLayout({ children }) {
   ];
 
   return (
-    <AdminWrapper>
-        <div className="flex h-screen bg-[#121212]">
+    <div className="flex h-screen bg-[#121212]">
       {/* Sidebar */}
       <div className="w-64 bg-[#1c1c1c] border-r border-slate-800 h-full flex flex-col">
         <div className="p-6">
@@ -88,9 +87,9 @@ export default function AdminLayout({ children }) {
             </div>
           </Link>
         </div>
-        
+
         <Separator className="bg-slate-800" />
-        
+
         <div className="flex-1 overflow-auto py-4 px-3">
           <nav className="space-y-1">
             {sidebarItems.map((item) => (
@@ -109,7 +108,7 @@ export default function AdminLayout({ children }) {
             ))}
           </nav>
         </div>
-        
+
         <div className="p-4 border-t border-slate-800">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center text-white">
@@ -124,7 +123,7 @@ export default function AdminLayout({ children }) {
               </p>
             </div>
           </div>
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -142,6 +141,5 @@ export default function AdminLayout({ children }) {
         <main className="h-full">{children}</main>
       </div>
     </div>
-    </AdminWrapper>
   );
 }

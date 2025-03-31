@@ -1,4 +1,3 @@
-// app/admin/experience/page.jsx
 import React from "react";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -37,19 +36,17 @@ import {
 import { Plus, Pencil, Filter, Search, Building, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-// Metadata
 export const metadata = {
   title: "Experience Timeline | Admin Dashboard",
   description: "Manage timeline of work experiences",
 };
 
-export default async function ExperienceTimelinePage({ searchParams }) {
-  // Get pagination params from URL
-  const page = parseInt(searchParams.page) || 1;
-  const limit = parseInt(searchParams.limit) || 10;
-  const current = searchParams.current === "true" ? true : (searchParams.current === "false" ? false : null);
-  
-  // Fetch experiences with pagination
+export default async function ExperienceTimelinePage({ searchParams = {} }) {
+  const page = parseInt(searchParams.page || "1", 10) || 1;
+  const limit = parseInt(searchParams.limit || "10", 10) || 10;
+  const currentStr = searchParams.current || null;
+  const current = currentStr === "true" ? true : currentStr === "false" ? false : null;
+
   const experiences = await getExperiences({
     page,
     limit,
@@ -57,8 +54,7 @@ export default async function ExperienceTimelinePage({ searchParams }) {
     sortBy: "order",
     sortOrder: "asc",
   });
-  
-  // Fetch total count for pagination
+
   const totalCount = await getExperienceCount(current);
   const totalPages = Math.ceil(totalCount / limit);
 
@@ -68,8 +64,7 @@ export default async function ExperienceTimelinePage({ searchParams }) {
         <h1 className="text-2xl font-bold text-white">Experience Timeline</h1>
         <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
           <Link href="/admin/experience/new">
-            <Plus size={16} className="mr-2" />
-            Add Experience
+            <Plus size={16} className="mr-2" /> Add Experience
           </Link>
         </Button>
       </div>
