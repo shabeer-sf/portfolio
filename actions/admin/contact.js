@@ -6,8 +6,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// Add dynamic flag for build system
-export const dynamic = 'force-dynamic';
+// Remove the dynamic export from here - it can't be in a "use server" file
 
 /**
  * Get all contacts with optional filtering and pagination
