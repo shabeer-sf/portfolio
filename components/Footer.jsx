@@ -112,7 +112,7 @@ const Footer = () => {
             transition={{ duration: 0.6 }}
             className="text-sm text-slate-500"
           >
-            © {currentYear} Shabeer.. All rights reserved.
+            © {currentYear} Shabeer. All rights reserved.
           </motion.p>
 
         
