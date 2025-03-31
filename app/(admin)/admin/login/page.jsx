@@ -1,7 +1,7 @@
 // app/admin/login/page.jsx
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,27 +28,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, Lock, Mail } from "lucide-react";
 
+// Import the separate component for handling search params
+import SearchParamsHandler from "@/app/components/SearchParamsHandler";
+
 // Form validation schema
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(1, { message: "Password is required" }),
 });
-
-// Search params handler component
-function SearchParamsHandler({ onParamsChange }) {
-  const { useSearchParams } = require("next/navigation");
-  const searchParams = useSearchParams();
-  
-  // Get the callback URL from search params
-  const callbackUrl = searchParams.get("callbackUrl") || "/admin";
-  
-  // Pass the callback URL to the parent component
-  useState(() => {
-    onParamsChange(callbackUrl);
-  }, [searchParams, onParamsChange]);
-
-  return null;
-}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -56,9 +43,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Callback to update the callback URL from the search params
-  const handleParamsChange = (url) => {
+  // Using useCallback to memoize the function
+  const handleParamsChange = useCallback((url) => {
     setCallbackUrl(url);
-  };
+  }, []);
 
   // Initialize form
   const form = useForm({
