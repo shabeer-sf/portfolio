@@ -79,7 +79,7 @@ const Navbar = () => {
           scrolled
             ? "bg-slate-900/80 backdrop-blur-md border-b border-slate-800/50"
             : "bg-transparent sm:py-5"
-        } w-screen`}
+        }`}
       >
         {/* Logo/Brand */}
         <Link href="#hero" className="flex items-center z-10">
