@@ -1,72 +1,71 @@
 // scripts/seed-projects.js
 const { PrismaClient } = require('@prisma/client');
-
 const prisma = new PrismaClient();
 
 const sampleProjects = [
   {
-    title: "E-commerce Website",
-    description: "A fully functional e-commerce platform built with Next.js and Stripe integration. Features include product catalog, shopping cart, user authentication, and payment processing.",
-    link: "https://ecommerce-example.com",
-    image: "https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg",
-    githubUrl: "https://github.com/user/ecommerce-project",
-    liveUrl: "https://ecommerce-example.com",
-    technologies: ["Next.js", "React", "Stripe", "Tailwind CSS", "Prisma", "PostgreSQL"],
+    title: "Zaesar - Multi-Perspective News Platform",
+    description: "An AI-powered news website that helps users view multiple perspectives on current news. Includes a children’s section with simplified, age-specific news.",
+    link: "https://zaesar.com",
+    image: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg",
+    githubUrl: "https://github.com/shabeer2520/zaesar",
+    liveUrl: "https://zaesar.com",
+    technologies: ["Next.js", "Tailwind CSS", "OpenAI API", "Clerk", "Prisma", "Planetscale"],
     category: "WEB",
     featured: true,
-    date: new Date("2024-01-15"),
+    date: new Date("2025-03-20"),
     order: 1
   },
   {
-    title: "Fitness Tracking App",
-    description: "A mobile application built with React Native that helps users track their workouts, nutrition, and fitness goals. Includes charts and analytics to visualize progress.",
-    link: "https://fitness-app-example.com",
-    image: "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg",
-    githubUrl: "https://github.com/user/fitness-app",
-    liveUrl: "https://fitness-app-example.com",
-    technologies: ["React Native", "Expo", "Firebase", "Redux", "Chart.js"],
+    title: "Offline Notes App",
+    description: "A simple and fast offline-first note-taking app built with Expo React Native. Supports rich-text formatting and local storage.",
+    link: "https://github.com/shabeer2520/offline-notes",
+    image: "https://images.pexels.com/photos/6362464/pexels-photo-6362464.jpeg",
+    githubUrl: "https://github.com/shabeer2520/offline-notes",
+    liveUrl: "https://github.com/shabeer2520/offline-notes",
+    technologies: ["React Native", "Expo", "AsyncStorage"],
     category: "MOBILE",
     featured: true,
-    date: new Date("2023-11-05"),
+    date: new Date("2025-02-10"),
     order: 2
   },
   {
-    title: "Task Management System",
-    description: "A project management tool inspired by Trello with drag-and-drop functionality, task assignments, due dates, and team collaboration features.",
-    link: "https://task-manager-example.com",
-    image: "https://images.pexels.com/photos/7148384/pexels-photo-7148384.jpeg",
-    githubUrl: "https://github.com/user/task-manager",
-    liveUrl: "https://task-manager-example.com",
-    technologies: ["React", "Node.js", "MongoDB", "Express", "Socket.io", "Docker"],
+    title: "E-Commerce Platform",
+    description: "A scalable eCommerce web application for mobile and web, built with React Native and Next.js. Features product listings, checkout, and order tracking.",
+    link: "https://ecommerce-shabeer.vercel.app",
+    image: "https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg",
+    githubUrl: "https://github.com/shabeer2520/ecommerce-platform",
+    liveUrl: "https://ecommerce-shabeer.vercel.app",
+    technologies: ["Next.js", "React Native", "Tailwind CSS", "Prisma", "Stripe"],
     category: "WEB",
     featured: false,
-    date: new Date("2023-09-20"),
+    date: new Date("2024-12-15"),
     order: 3
   },
   {
-    title: "Weather Forecast API",
-    description: "A RESTful API service that provides weather forecasts by city, with historical data and machine learning predictions for long-term forecasts.",
-    link: "https://weather-api-example.com",
-    image: "https://images.pexels.com/photos/1118873/pexels-photo-1118873.jpeg",
-    githubUrl: "https://github.com/user/weather-api",
-    liveUrl: "https://weather-api-example.com",
-    technologies: ["Node.js", "Express", "MongoDB", "Python", "TensorFlow", "Docker"],
-    category: "BACKEND",
+    title: "Admin Dashboard",
+    description: "A clean and modern admin dashboard built using Next.js with server-side rendering, chart visualizations, and role-based access.",
+    link: "https://github.com/shabeer2520/admin-dashboard",
+    image: "https://images.pexels.com/photos/6693655/pexels-photo-6693655.jpeg",
+    githubUrl: "https://github.com/shabeer2520/admin-dashboard",
+    liveUrl: "https://admin-dashboard-shabeer.vercel.app",
+    technologies: ["Next.js", "Tailwind CSS", "Recharts", "Prisma"],
+    category: "WEB",
     featured: false,
-    date: new Date("2023-07-10"),
+    date: new Date("2024-11-02"),
     order: 4
   },
   {
-    title: "Portfolio Website",
-    description: "A responsive portfolio website built with Next.js and Tailwind CSS, featuring a clean design, dark mode, and integration with a headless CMS for content management.",
-    link: "https://portfolio-example.com",
-    image: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg",
-    githubUrl: "https://github.com/user/portfolio",
-    liveUrl: "https://portfolio-example.com",
-    technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "Sanity CMS"],
-    category: "WEB",
+    title: "Gym & Fitness Info App",
+    description: "A no-login fitness info app tailored for different body types. Includes calorie calculators, exercise tips, and a built-in pedometer.",
+    link: "https://github.com/shabeer2520/gym-app",
+    image: "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg",
+    githubUrl: "https://github.com/shabeer2520/gym-app",
+    liveUrl: "https://github.com/shabeer2520/gym-app",
+    technologies: ["React Native", "Expo", "Redux", "Local Storage"],
+    category: "MOBILE",
     featured: false,
-    date: new Date("2023-05-15"),
+    date: new Date("2024-10-12"),
     order: 5
   }
 ];
@@ -74,8 +73,6 @@ const sampleProjects = [
 async function main() {
   try {
     console.log('🌱 Starting projects seed...');
-
-    // First, check how many projects we already have
     const existingCount = await prisma.project.count();
 
     if (existingCount > 0) {
@@ -83,7 +80,6 @@ async function main() {
       return;
     }
 
-    // Seed all projects
     for (const project of sampleProjects) {
       await prisma.project.create({
         data: project

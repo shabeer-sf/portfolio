@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Building, Check } from "lucide-react";
+import { Calendar, Building, CheckCircle, Award, Briefcase, MapPin } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { getTimeline } from "@/actions/experience";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,7 +36,7 @@ const Timeline = () => {
     fetchExperiences();
   }, []);
 
-  // Format date range (e.g., "2022 - 2024" or "2024 - Present")
+  // Format date range with improved formatting
   const formatDateRange = (startDate, endDate, isCurrent) => {
     if (!startDate) return "N/A";
     
@@ -44,62 +44,83 @@ const Timeline = () => {
       // Parse dates safely
       const start = typeof startDate === 'string' ? parseISO(startDate) : new Date(startDate);
       const startYear = format(start, "yyyy");
+      const startMonth = format(start, "MMM");
       
-      let endYear;
+      let endDisplay;
       if (isCurrent) {
-        endYear = "Present";
+        endDisplay = "Present";
       } else if (endDate) {
         const end = typeof endDate === 'string' ? parseISO(endDate) : new Date(endDate);
-        endYear = format(end, "yyyy");
+        const endYear = format(end, "yyyy");
+        const endMonth = format(end, "MMM");
+        
+        if (startYear === endYear) {
+          endDisplay = `${endMonth} ${endYear}`;
+        } else {
+          endDisplay = `${endMonth} ${endYear}`;
+        }
       } else {
-        endYear = "Present";
+        endDisplay = "Present";
       }
       
-      return `${startYear} - ${endYear}`;
+      return `${startMonth} ${startYear} - ${endDisplay}`;
     } catch (error) {
       console.error("Date formatting error:", error);
       return "Date Error";
     }
   };
 
-  // Animation variants
+  // Animation variants with improved timing and effects
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.3,
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { x: -20, opacity: 0 },
+    hidden: { x: -30, opacity: 0 },
     visible: {
       x: 0,
       opacity: 1,
       transition: {
-        duration: 0.6,
+        type: "spring",
+        stiffness: 100,
+        damping: 12,
+        duration: 0.7,
       },
     },
   };
 
   const childVariants = {
-    hidden: { y: 10, opacity: 0 },
+    hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.4,
+        type: "spring",
+        stiffness: 70,
+        damping: 10,
+        duration: 0.5,
       },
     },
   };
 
   return (
-    <section id="experience" className="pt-24 pb-20 relative">
-      {/* Background elements */}
-      <div className="absolute top-60 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-40 right-10 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl -z-10" />
+    <section id="experience" className="py-32 relative overflow-hidden">
+      {/* Enhanced background elements */}
+      <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-slate-900 to-transparent -z-10" />
+      <div className="absolute top-60 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl opacity-20 -z-10" />
+      <div className="absolute bottom-40 right-10 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl opacity-20 -z-10" />
+      
+      {/* Small decorative elements */}
+      <div className="absolute top-1/3 left-1/4 w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
+      <div className="absolute bottom-1/3 right-1/4 w-1 h-1 bg-purple-500 rounded-full animate-pulse delay-300" />
+      <div className="absolute top-2/3 right-1/3 w-1 h-1 bg-cyan-500 rounded-full animate-pulse delay-700" />
       
       <div className="max-w-5xl mx-auto px-6">
         <motion.div 
@@ -107,24 +128,26 @@ const Timeline = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center space-y-4 mb-16"
+          className="text-center space-y-6 mb-20"
         >
-          <Badge variant="outline" className="px-4 py-1 text-sm font-normal border-slate-700 text-slate-400">
+          <Badge 
+            variant="outline" 
+            className="px-5 py-1.5 text-sm font-medium rounded-full border-slate-700 text-slate-300 bg-slate-900/50 backdrop-blur-sm"
+          >
             My Journey
           </Badge>
           
-          <div className="space-y-2">
-            <h2 className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-              Professional Experience
-            </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto pt-4">
-              A timeline of my professional journey, highlighting key roles and achievements in my career.
-            </p>
-          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-slate-200">
+            Professional Experience
+          </h2>
+          
+          <p className="text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
+            A timeline of my professional journey, highlighting key roles and achievements in my career.
+          </p>
         </motion.div>
 
         {error ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 px-6 bg-red-950/20 border border-red-800/30 rounded-xl backdrop-blur-sm">
             <p className="text-red-400">{error}</p>
           </div>
         ) : (
@@ -132,37 +155,36 @@ const Timeline = () => {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "-50px" }}
             className="relative"
           >
-            {/* Main vertical timeline line */}
-            <div className="absolute left-[28px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-600/30 via-purple-600/30 to-slate-600/30 ml-0.5 md:ml-0"></div>
-
+            {/* Enhanced vertical timeline line with dot markers */}
+            <div className="absolute left-[28px] top-0 bottom-0 w-[3px] bg-gradient-to-b from-blue-600/40 via-purple-600/40 to-slate-600/30 ml-0.5 md:ml-0"></div>
+            
             {isLoading ? (
-              // Loading skeletons
+              // Enhanced loading skeletons
               Array(2).fill(null).map((_, index) => (
-                <div key={index} className="mb-16 relative">
-                  <div className="absolute left-0 w-14 h-14 rounded-full bg-[#1c1c1c] border border-slate-700 shadow-lg"></div>
-                  <div className="ml-20 relative">
-                    <Skeleton className="h-8 w-24 mb-3" />
-                    <Card className="bg-[#1c1c1c] border-slate-800 overflow-hidden shadow-lg mb-4">
+                <div key={index} className="mb-20 relative">
+                  <div className="absolute left-0 w-16 h-16 rounded-full bg-slate-900/80 border border-slate-700/50 shadow-lg"></div>
+                  <div className="ml-24 relative">
+                    <Skeleton className="h-8 w-40 mb-4 rounded-full" />
+                    <Card className="bg-slate-900/60 backdrop-blur-sm border-slate-800/50 overflow-hidden shadow-xl rounded-xl">
                       <CardContent className="p-0">
-                        <div className="p-6 border-b border-slate-800">
-                          <Skeleton className="h-7 w-48 mb-2" />
-                          <Skeleton className="h-5 w-32" />
+                        <div className="p-6 border-b border-slate-800/50">
+                          <Skeleton className="h-7 w-64 mb-2" />
+                          <Skeleton className="h-5 w-48" />
                         </div>
                         <div className="p-6">
-                          <Skeleton className="h-4 w-40 mb-4" />
+                          <Skeleton className="h-5 w-40 mb-6" />
                           <div className="space-y-4">
-                            <Skeleton className="h-16 w-full" />
-                            <Skeleton className="h-16 w-full" />
-                            <Skeleton className="h-16 w-full" />
+                            <Skeleton className="h-20 w-full rounded-lg" />
+                            <Skeleton className="h-20 w-full rounded-lg" />
                           </div>
-                          <Skeleton className="h-4 w-40 mt-6 mb-4" />
-                          <div className="flex gap-2">
-                            <Skeleton className="h-6 w-20 rounded-full" />
-                            <Skeleton className="h-6 w-20 rounded-full" />
-                            <Skeleton className="h-6 w-20 rounded-full" />
+                          <Skeleton className="h-5 w-40 mt-8 mb-4" />
+                          <div className="flex flex-wrap gap-2">
+                            <Skeleton className="h-8 w-20 rounded-full" />
+                            <Skeleton className="h-8 w-24 rounded-full" />
+                            <Skeleton className="h-8 w-28 rounded-full" />
                           </div>
                         </div>
                       </CardContent>
@@ -175,51 +197,75 @@ const Timeline = () => {
                 <motion.div 
                   key={exp.id || index} 
                   variants={itemVariants}
-                  className="mb-16 relative"
+                  className="mb-20 relative"
+                  whileHover={{ x: 5 }}
                 >
-                  {/* Year circle marker */}
-                  <div className="absolute left-0 w-14 h-14 rounded-full bg-[#1c1c1c] border border-slate-700 flex items-center justify-center shadow-lg z-10">
-                    <Clock size={20} className="text-slate-400" />
-                  </div>
+                  {/* Year circle marker with enhanced styling */}
+                  <motion.div 
+                    className="absolute left-0 w-16 h-16 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-lg z-10"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
+                    <Briefcase size={24} className="text-blue-400" />
+                  </motion.div>
 
                   {/* Experience content */}
-                  <div className="ml-20 relative">
-                    {/* Year badge */}
-                    <motion.div variants={childVariants} className="mb-3">
-                      <Badge className="bg-slate-800 hover:bg-slate-800 text-slate-300 text-sm px-3 py-1">
+                  <div className="ml-24 relative">
+                    {/* Year badge with enhanced styling */}
+                    <motion.div variants={childVariants} className="mb-4">
+                      <Badge className="bg-slate-800/80 backdrop-blur-sm hover:bg-slate-800 text-white px-4 py-1.5 text-sm font-medium rounded-full border border-slate-700/50 shadow-md">
+                        <Calendar size={14} className="mr-2 text-blue-400" />
                         {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
                       </Badge>
                     </motion.div>
 
-                    {/* Company card */}
-                    <motion.div variants={childVariants}>
-                      <Card className="bg-[#1c1c1c] border-slate-800 overflow-hidden shadow-lg mb-4">
+                    {/* Company card with enhanced styling */}
+                    <motion.div 
+                      variants={childVariants}
+                      whileHover={{ y: -5 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                    >
+                      <Card className="bg-gradient-to-b from-slate-800/80 to-slate-900/80 backdrop-blur-sm border-slate-700/50 overflow-hidden shadow-xl rounded-xl">
                         <CardContent className="p-0">
-                          <div className="p-6 border-b border-slate-800 flex items-start gap-3">
-                            <Building className="text-slate-400 mt-1" size={20} />
-                            <div>
-                              <h3 className="text-xl font-bold text-white mb-1">{exp.company}</h3>
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                                <p className="text-slate-400">{exp.location}</p>
-                                {exp.title && (
-                                  <>
-                                    <span className="hidden sm:inline text-slate-600">•</span>
-                                    <p className="text-blue-400">{exp.title}</p>
-                                  </>
-                                )}
-                                {exp.isCurrent && (
-                                  <Badge variant="outline" className="w-fit border-green-500/20 text-green-400 mt-1 sm:mt-0">
-                                    Current
-                                  </Badge>
-                                )}
+                          {/* Company header with enhanced styling */}
+                          <div className="p-6 border-b border-slate-700/50 bg-slate-800/30">
+                            <div className="flex flex-col md:flex-row md:items-start gap-4">
+                              <div className="flex-1">
+                                <h3 className="text-2xl font-bold text-white mb-2">{exp.company}</h3>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                                  <div className="flex items-center gap-1 text-slate-300">
+                                    <MapPin size={14} className="text-blue-400" />
+                                    <span>{exp.location}</span>
+                                  </div>
+                                  
+                                  {exp.title && (
+                                    <>
+                                      <span className="hidden sm:inline text-slate-600">•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Award size={14} className="text-purple-400" />
+                                        <p className="text-purple-400 font-medium">{exp.title}</p>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
                               </div>
+                              
+                              {exp.isCurrent && (
+                                <Badge variant="outline" className="w-fit border-green-500/30 bg-green-900/20 text-green-400 px-3 py-1 rounded-full shadow-inner shadow-green-900/10">
+                                  Current Position
+                                </Badge>
+                              )}
                             </div>
                           </div>
                           
-                          {/* Roles */}
-                          <div className="p-6 pt-4">
-                            <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider mb-3">Key Responsibilities</h4>
-                            <ul className="space-y-4">
+                          {/* Roles with enhanced styling */}
+                          <div className="p-6">
+                            <h4 className="text-slate-200 font-medium text-sm uppercase tracking-wider mb-4 flex items-center">
+                              <span className="inline-block w-8 h-px bg-blue-500/50 mr-2"></span>
+                              Key Responsibilities
+                            </h4>
+                            
+                            <ul className="space-y-4 mb-8">
                               {exp.roles && Array.isArray(exp.roles) ? (
                                 exp.roles.map((role, idx) => (
                                   <motion.li 
@@ -230,12 +276,12 @@ const Timeline = () => {
                                     viewport={{ once: true }}
                                     className="flex items-start gap-3"
                                   >
-                                    <div className="min-w-6 mt-1">
-                                      <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                        <Check size={12} className="text-blue-400" />
+                                    <div className="min-w-6 mt-0.5">
+                                      <div className="w-5 h-5 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center">
+                                        <CheckCircle size={12} className="text-blue-400" />
                                       </div>
                                     </div>
-                                    <p className="text-slate-300 text-sm">{role}</p>
+                                    <p className="text-slate-300 text-sm leading-relaxed">{role}</p>
                                   </motion.li>
                                 ))
                               ) : (
@@ -243,13 +289,21 @@ const Timeline = () => {
                               )}
                             </ul>
                             
-                            {/* Skills */}
-                            <div className="mt-6">
-                              <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider mb-3">Technologies & Skills</h4>
+                            {/* Skills with enhanced styling */}
+                            <div>
+                              <h4 className="text-slate-200 font-medium text-sm uppercase tracking-wider mb-4 flex items-center">
+                                <span className="inline-block w-8 h-px bg-purple-500/50 mr-2"></span>
+                                Technologies & Skills
+                              </h4>
+                              
                               <div className="flex flex-wrap gap-2">
                                 {exp.skills && Array.isArray(exp.skills) ? (
                                   exp.skills.map((skill, skillIdx) => (
-                                    <Badge key={skillIdx} variant="secondary" className="bg-slate-800/50 hover:bg-slate-800 text-slate-300">
+                                    <Badge 
+                                      key={skillIdx} 
+                                      variant="secondary" 
+                                      className="bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 hover:border-blue-500/30 hover:bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 transition-all duration-300"
+                                    >
                                       {skill}
                                     </Badge>
                                   ))
@@ -266,7 +320,7 @@ const Timeline = () => {
                 </motion.div>
               ))
             ) : (
-              <div className="text-center py-12">
+              <div className="text-center py-16 px-6 bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl">
                 <p className="text-slate-400">No experience data found</p>
               </div>
             )}

@@ -115,10 +115,10 @@ const ContactForm = () => {
                 </CardTitle>
                 <CardDescription className="text-slate-400">
                   <a 
-                    href="mailto:shabeersggs@gmail.com" 
+                    href="mailto:mohammedshabeer2520@gmail.com" 
                     className="transition-colors hover:text-slate-200"
                   >
-                    shabeersggs@gmail.com
+                    mohammedshabeer2520@gmail.com
                   </a>
                 </CardDescription>
               </CardContent>

@@ -169,4 +169,4 @@ MIT
 
 ## Contact
 
-For inquiries, please reach out via the contact form on the website or email directly at shabeersggs@gmail.com.
+For inquiries, please reach out via the contact form on the website or email directly at mohammedshabeer2520@gmail.com.
