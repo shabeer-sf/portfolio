@@ -1,9 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// Enhanced Prisma Schema with fixed relationships
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,8 +12,11 @@ model Contact {
   id        String   @id @default(uuid())
   name      String   @db.VarChar(50)
   email     String   @db.VarChar(100)
+  subject   String?  @db.VarChar(100)    // Optional subject line
   message   String   @db.Text
-  status    ContactStatus @default(UNREAD) // Track message status
+  status    ContactStatus @default(UNREAD)
+  priority  ContactPriority @default(NORMAL) // Message priority
+  source    String?  @db.VarChar(50)     // Where the contact came from
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -30,65 +28,231 @@ enum ContactStatus {
   ARCHIVED
 }
 
-model Project {
-  id              String   @id @default(uuid())
-  title           String   @db.VarChar(100)  // Project title
-  description     String   @db.Text          // Short description
-  link            String   @db.VarChar(255)  // Project link
-  image           String   @db.VarChar(255)  // Image URL
-  githubUrl       String?  @db.VarChar(255)  // Optional GitHub repository URL
-  liveUrl         String?  @db.VarChar(255)  // Optional live demo URL
-  technologies    String[] // Array of technologies used
-  category        ProjectCategory @default(WEB) // Project category
-  featured        Boolean  @default(false)    // Whether to feature project
-  date            DateTime @default(now())    // Project completion date
-  order           Int      @default(0)        // Display order
-  createdAt       DateTime @default(now())    // Timestamp for creation
-  updatedAt       DateTime @updatedAt         // Auto-updated timestamp
+enum ContactPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
 }
 
-enum ProjectCategory {
+model Project {
+  id               String   @id @default(uuid())
+  title            String   @db.VarChar(100)
+  slug             String   @unique @db.VarChar(100) // URL-friendly slug
+  shortDescription String   @db.VarChar(200)         // For cards/listings
+  longDescription  String   @db.Text                 // Detailed description
+  content          String?  @db.Text                 // Full project content/story
+  problem          String?  @db.Text                 // Problem statement
+  solution         String?  @db.Text                 // Solution approach
+  results          String?  @db.Text                 // Project outcomes
+  link             String   @db.VarChar(255)
+  image            String   @db.VarChar(255)
+  images           String[] // Multiple project images
+  githubUrl        String?  @db.VarChar(255)
+  showGithub       Boolean  @default(true)           // Whether to show GitHub link
+  liveUrl          String?  @db.VarChar(255)
+  demoUrl          String?  @db.VarChar(255)         // Demo video URL
+  technologies     String[]
+  features         String[] // Key features list
+  challenges       String[] // Technical challenges faced
+  learnings        String[] // What was learned
+  categoryId       String?                          // Reference to dynamic category
+  category         ProjectCategoryLegacy @default(WEB)   // Keep for backward compatibility
+  status           ProjectStatus @default(COMPLETED)
+  featured         Boolean  @default(false)
+  teamSize         Int?                               // Team size
+  duration         String?  @db.VarChar(50)          // Project duration
+  client           String?  @db.VarChar(100)         // Client name
+  role             String?  @db.VarChar(100)         // Your role in project
+  date             DateTime @default(now())
+  startDate        DateTime?                         // Project start date
+  endDate          DateTime?                         // Project end date
+  order            Int      @default(0)
+  views            Int      @default(0)              // View counter
+  likes            Int      @default(0)              // Like counter
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations - Fixed many-to-many relationship
+  projectTags      ProjectOnTag[]
+  testimonials     Testimonial[]
+  projectCategory  ProjectCategory? @relation(fields: [categoryId], references: [id])
+}
+
+model ProjectCategory {
+  id          String    @id @default(uuid())
+  name        String    @unique @db.VarChar(50)
+  slug        String    @unique @db.VarChar(50)
+  description String?   @db.Text
+  color       String?   @db.VarChar(20)         // Hex color for UI
+  icon        String?   @db.VarChar(50)         // Icon name
+  order       Int       @default(0)             // Display order
+  isActive    Boolean   @default(true)          // Whether category is active
+  projects    Project[] // Related projects
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum ProjectCategoryLegacy {
   WEB
   MOBILE
   BACKEND
+  FULLSTACK
+  API
+  DATABASE
+  DEVOPS
   OTHER
+}
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  PAUSED
+  CANCELLED
+}
+
+model ProjectTag {
+  id        String   @id @default(uuid())
+  name      String   @unique @db.VarChar(50)
+  color     String?  @db.VarChar(20)  // Hex color
+  createdAt DateTime @default(now())
+  
+  // Relations - Fixed many-to-many relationship
+  projectTags ProjectOnTag[]
+}
+
+// Join table for many-to-many relationship between Project and ProjectTag
+model ProjectOnTag {
+  projectId String
+  tagId     String
+  
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tag       ProjectTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([projectId, tagId])
 }
 
 model Experience {
   id          String   @id @default(uuid())
-  company     String   @db.VarChar(100)  // Company name
-  location    String   @db.VarChar(100)  // Company location
-  startDate   DateTime // Start date
-  endDate     DateTime? // End date (null if current)
-  isCurrent   Boolean  @default(false)   // If this is current position
-  title       String   @db.VarChar(100)  // Job title
-  description String   @db.Text          // Job description
-  roles       String[] // Array of key responsibilities
-  skills      String[] // Skills used/gained
-  order       Int      @default(0)      // Display order
+  company     String   @db.VarChar(100)
+  location    String   @db.VarChar(100)
+  website     String?  @db.VarChar(255)     // Company website
+  companyLogo String?  @db.VarChar(255)     // Company logo URL
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean  @default(false)
+  title       String   @db.VarChar(100)
+  department  String?  @db.VarChar(100)     // Department/team
+  description String   @db.Text
+  achievements String[] // Key achievements
+  roles       String[]
+  skills      String[]
+  projects    String[] // Project names worked on
+  teamSize    Int?     // Team size managed/worked with
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Education {
+  id           String   @id @default(uuid())
+  institution  String   @db.VarChar(100)  // School/University name
+  degree       String   @db.VarChar(100)  // Degree type
+  field        String   @db.VarChar(100)  // Field of study
+  location     String   @db.VarChar(100)  // Institution location
+  startDate    DateTime                   // Start date
+  endDate      DateTime?                  // End date (null if ongoing)
+  isCurrent    Boolean  @default(false)   // Currently studying
+  gpa          String?  @db.VarChar(10)   // GPA/Grade
+  description  String?  @db.Text          // Additional details
+  achievements String[]                   // Academic achievements
+  coursework   String[]                   // Relevant coursework
+  order        Int      @default(0)       // Display order
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Certification {
+  id           String   @id @default(uuid())
+  name         String   @db.VarChar(100)  // Certification name
+  issuer       String   @db.VarChar(100)  // Issuing organization
+  credentialId String?  @db.VarChar(100)  // Credential ID
+  url          String?  @db.VarChar(255)  // Verification URL
+  image        String?  @db.VarChar(255)  // Certificate image
+  issueDate    DateTime                   // Issue date
+  expiryDate   DateTime?                  // Expiry date (null if no expiry)
+  skills       String[]                   // Related skills
+  description  String?  @db.Text          // Additional details
+  order        Int      @default(0)       // Display order
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Testimonial {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(100)   // Client/colleague name
+  role        String   @db.VarChar(100)   // Their role/title
+  company     String   @db.VarChar(100)   // Their company
+  image       String?  @db.VarChar(255)   // Their photo
+  content     String   @db.Text           // Testimonial content
+  rating      Int?     @default(5)        // Rating out of 5
+  projectId   String?                     // Related project
+  project     Project? @relation(fields: [projectId], references: [id])
+  featured    Boolean  @default(false)    // Feature on homepage
+  order       Int      @default(0)        // Display order
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model Service {
   id           String   @id @default(uuid())
-  title        String   @db.VarChar(100) // Service title
-  description  String   @db.Text         // Service description
-  icon         String   @db.VarChar(50)  // Icon name (from Lucide)
-  color        String   @db.VarChar(50)  // Color theme
-  technologies String[] // Array of related technologies/tags
-  order        Int      @default(0)      // Display order
+  title        String   @db.VarChar(100)
+  slug         String   @unique @db.VarChar(100) // URL-friendly slug
+  shortDescription String @db.VarChar(200)       // For cards
+  description  String   @db.Text                 // Detailed description
+  process      String[] // Service process steps
+  deliverables String[] // What client gets
+  pricing      String?  @db.Text                 // Pricing information
+  duration     String?  @db.VarChar(50)          // Typical duration
+  icon         String   @db.VarChar(50)
+  color        String   @db.VarChar(50)
+  technologies String[]
+  featured     Boolean  @default(false)          // Feature on homepage
+  order        Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
+model BlogPost {
+  id              String   @id @default(uuid())
+  title           String   @db.VarChar(200)
+  slug            String   @unique @db.VarChar(200)
+  excerpt         String   @db.VarChar(300)       // Short description
+  content         String   @db.Text               // Full content (Markdown)
+  featuredImage   String?  @db.VarChar(255)       // Featured image
+  images          String[]                        // Additional images
+  tags            String[]                        // Blog tags
+  category        String   @db.VarChar(50)        // Blog category
+  readTime        Int?                            // Estimated read time in minutes
+  published       Boolean  @default(false)       // Published status
+  featured        Boolean  @default(false)       // Featured post
+  views           Int      @default(0)            // View counter
+  likes           Int      @default(0)            // Like counter
+  publishedAt     DateTime?                       // Publish date
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
 model SocialLink {
   id        String   @id @default(uuid())
-  platform  String   @db.VarChar(50)  // Platform name
-  url       String   @db.VarChar(255) // URL to profile
-  icon      String   @db.VarChar(50)  // Icon name
-  order     Int      @default(0)      // Display order
-  isActive  Boolean  @default(true)   // If link is active
+  platform  String   @db.VarChar(50)
+  username  String?  @db.VarChar(100)     // Username on platform
+  url       String   @db.VarChar(255)
+  icon      String   @db.VarChar(50)
+  color     String?  @db.VarChar(20)      // Platform brand color
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -96,30 +260,98 @@ model SocialLink {
 model Profile {
   id              String   @id @default(uuid())
   name            String   @db.VarChar(100)
-  title           String   @db.VarChar(100) // Professional title
+  tagline         String?  @db.VarChar(200)     // Professional tagline
+  title           String   @db.VarChar(100)
   email           String   @db.VarChar(100)
   phone           String?  @db.VarChar(20)
   location        String?  @db.VarChar(100)
+  timezone        String?  @db.VarChar(50)      // Timezone
   bio             String   @db.Text
-  resumeUrl       String?  @db.VarChar(255) // URL to resume file
-  profileImageUrl String?  @db.VarChar(255) // URL to profile image
-  skills          String[] // Array of skills
+  about           String?  @db.Text             // Longer about section
+  interests       String[]                      // Personal interests
+  languages       Json?                         // Languages with proficiency
+  availability    String?  @db.VarChar(100)     // Current availability
+  hourlyRate      String?  @db.VarChar(50)      // Hourly rate
+  resumeUrl       String?  @db.VarChar(255)
+  profileImageUrl String?  @db.VarChar(255)
+  coverImageUrl   String?  @db.VarChar(255)     // Cover/banner image
+  skills          String[]
+  tools           String[]                      // Tools/software used
+  yearsExperience Int?                          // Years of experience
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 
-// schema.prisma (add to your existing schema)
+model Skill {
+  id          String    @id @default(uuid())
+  name        String    @unique @db.VarChar(100)
+  category    SkillCategory
+  level       SkillLevel @default(INTERMEDIATE)
+  years       Int?                              // Years of experience
+  icon        String?   @db.VarChar(255)        // Skill icon/logo
+  color       String?   @db.VarChar(20)         // Associated color
+  description String?   @db.Text               // Skill description
+  order       Int       @default(0)             // Display order
+  featured    Boolean   @default(false)         // Feature on homepage
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum SkillCategory {
+  FRONTEND
+  BACKEND
+  DATABASE
+  DEVOPS
+  MOBILE
+  DESIGN
+  TOOLS
+  SOFT_SKILLS
+  OTHER
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
 model User {
-  id            String    @id @default(uuid())
-  name          String?
-  email         String    @unique
-  password      String
-  role          UserRole  @default(USER)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum UserRole {
   USER
   ADMIN
+  MODERATOR
+}
+
+model Analytics {
+  id           String   @id @default(uuid())
+  page         String   @db.VarChar(100)      // Page visited
+  event        String   @db.VarChar(100)      // Event type
+  data         Json?                          // Additional data
+  userAgent    String?  @db.Text             // User agent
+  ipAddress    String?  @db.VarChar(45)      // IP address (hashed)
+  referrer     String?  @db.VarChar(255)     // Referrer URL
+  sessionId    String?  @db.VarChar(100)     // Session ID
+  createdAt    DateTime @default(now())
+}
+
+model Newsletter {
+  id          String   @id @default(uuid())
+  email       String   @unique @db.VarChar(100)
+  isActive    Boolean  @default(true)         // Subscription status
+  tags        String[]                        // Subscriber tags/interests
+  source      String?  @db.VarChar(50)        // Subscription source
+  subscribedAt DateTime @default(now())
+  unsubscribedAt DateTime?                    // Unsubscribe date
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

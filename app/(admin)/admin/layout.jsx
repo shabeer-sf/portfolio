@@ -13,6 +13,7 @@ import {
   UserCircle,
   Settings,
   LogOut,
+  Palette,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -54,13 +55,19 @@ export default function AdminLayout({ children }) {
       title: "Projects",
       icon: FolderKanban,
       href: "/admin/projects",
-      active: pathname === "/admin/projects",
+      active: pathname.startsWith("/admin/projects"),
+    },
+    {
+      title: "Categories",
+      icon: Palette,
+      href: "/admin/categories",
+      active: pathname.startsWith("/admin/categories"),
     },
     {
       title: "Experience",
       icon: Briefcase,
       href: "/admin/experience",
-      active: pathname === "/admin/experience",
+      active: pathname.startsWith("/admin/experience"),
     },
     {
       title: "Profile",

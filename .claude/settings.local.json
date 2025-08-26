@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(npm run seed-all:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npm run clear-setup:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npm run seed-admin-only:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

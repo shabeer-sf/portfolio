@@ -1,6 +1,5 @@
 // scripts/seed-experiences.js
 const { PrismaClient } = require('@prisma/client');
-
 const prisma = new PrismaClient();
 
 const sampleExperiences = [
@@ -8,16 +7,20 @@ const sampleExperiences = [
     company: "Doutya Private Limited",
     location: "Bangalore, India",
     title: "Full Stack Developer",
-    description: "Led development of cross-platform mobile applications and SaaS solutions.",
+    description: "Currently working on multiple projects involving web and mobile app development using modern frameworks and technologies.",
     startDate: new Date("2024-01-01"),
     endDate: new Date("2025-01-01"),
     isCurrent: true,
     roles: [
-      "Developed and maintained cross-platform mobile applications using Expo and React Native, ensuring seamless functionality and performance on both iOS and Android platforms.",
-      "Implemented and integrated various third-party services and APIs, such as Firebase, Google Maps, and payment gateways, to extend app functionality and provide a richer user experience.",
-      "Worked on Software-as-a-Service (SaaS) solutions, contributing to the digital transformation of businesses."
+      "Currently leading multiple full stack projects across React, Expo React Native, Flutter, Next.js, PHP, MongoDB, and MySQL.",
+      "Developed and maintained cross-platform mobile applications ensuring seamless functionality and performance on both iOS and Android.",
+      "Integrated various third-party services and APIs, such as Firebase, Google Maps, and payment gateways, to extend app capabilities.",
+      "Contributed to the design and implementation of Software-as-a-Service (SaaS) platforms for client business transformation."
     ],
-    skills: ["React Native", "Expo", "Firebase", "SaaS", "API Integration"],
+    skills: [
+      "React", "Expo React Native", "Flutter", "Next.js",
+      "PHP", "MongoDB", "MySQL", "Firebase", "SaaS", "API Integration"
+    ],
     order: 1
   },
   {
@@ -42,15 +45,13 @@ async function main() {
   try {
     console.log('🌱 Starting experiences seed...');
 
-    // Delete existing experiences first for a clean slate
+    // Delete existing experiences for a clean slate
     await prisma.experience.deleteMany({});
     console.log('✅ Cleared existing experiences');
 
     // Seed all experiences
     for (const experience of sampleExperiences) {
-      await prisma.experience.create({
-        data: experience
-      });
+      await prisma.experience.create({ data: experience });
     }
 
     console.log(`✅ Successfully seeded ${sampleExperiences.length} experiences`);

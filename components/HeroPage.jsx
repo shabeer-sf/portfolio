@@ -2,10 +2,11 @@
 import Image from "next/image";
 import React from "react";
 import { motion } from "framer-motion";
-import { Download, ChevronDown } from "lucide-react";
+import { Download, ChevronDown, Github, Linkedin, Mail, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ImageSlider from "./ImageSlider";
+import Link from "next/link";
 
 const HeroPage = () => {
   return (
@@ -61,6 +62,40 @@ const HeroPage = () => {
         <p className="text-slate-300 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto text-center mt-2 sm:mt-4 text-sm sm:text-base md:text-lg leading-relaxed">
           Building beautiful, responsive, and high-performance applications for web and mobile platforms.
         </p>
+        
+        {/* Social links */}
+        <div className="flex items-center justify-center gap-4 mt-6">
+          <motion.a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-full text-slate-400 hover:text-white hover:border-slate-600 transition-all duration-300 group"
+          >
+            <Github size={20} className="group-hover:text-white transition-colors duration-300" />
+          </motion.a>
+          
+          <motion.a
+            href="https://linkedin.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-full text-slate-400 hover:text-blue-400 hover:border-blue-400/50 transition-all duration-300 group"
+          >
+            <Linkedin size={20} className="group-hover:text-blue-400 transition-colors duration-300" />
+          </motion.a>
+          
+          <motion.a
+            href="mailto:shabeermen@gmail.com"
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-full text-slate-400 hover:text-purple-400 hover:border-purple-400/50 transition-all duration-300 group"
+          >
+            <Mail size={20} className="group-hover:text-purple-400 transition-colors duration-300" />
+          </motion.a>
+        </div>
       </motion.div>
       
       {/* Responsive buttons */}
@@ -71,15 +106,15 @@ const HeroPage = () => {
         className="flex flex-wrap justify-center gap-3 sm:gap-4 w-full px-4"
       >
         <Button 
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-none shadow-lg px-4 sm:px-6 py-5 sm:py-6 text-sm sm:text-base rounded-lg w-full sm:w-auto"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-none shadow-lg px-4 sm:px-6 py-5 sm:py-6 text-sm sm:text-base rounded-lg w-full sm:w-auto group"
         >
-          <Download size={16} className="mr-2 flex-shrink-0" />
+          <Download size={16} className="mr-2 flex-shrink-0 group-hover:animate-bounce" />
           <span>Download Resume</span>
         </Button>
         
-        {/* <Button 
+        <Button 
           variant="outline"
-          className="bg-slate-900/50 backdrop-blur-sm border-slate-700 hover:bg-slate-800 text-white px-4 sm:px-6 py-5 sm:py-6 text-sm sm:text-base rounded-lg w-full sm:w-auto"
+          className="bg-slate-900/50 backdrop-blur-sm border-slate-700 hover:bg-slate-800 text-white px-4 sm:px-6 py-5 sm:py-6 text-sm sm:text-base rounded-lg w-full sm:w-auto group"
           onClick={() => {
             const projectsSection = document.getElementById('projects');
             if (projectsSection) {
@@ -88,7 +123,8 @@ const HeroPage = () => {
           }}
         >
           View Projects
-        </Button> */}
+          <ExternalLink size={16} className="ml-2 flex-shrink-0 group-hover:translate-x-1 transition-transform duration-300" />
+        </Button>
       </motion.div>
       
       {/* Responsive image slider container */}

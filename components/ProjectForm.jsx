@@ -52,6 +52,7 @@ const projectSchema = z.object({
   link: z.string().url({ message: 'Please enter a valid URL' }),
   image: z.string().url({ message: 'Please enter a valid image URL' }),
   githubUrl: z.string().url({ message: 'Please enter a valid GitHub URL' }).optional().or(z.literal('')),
+  showGithub: z.boolean().default(true),
   liveUrl: z.string().url({ message: 'Please enter a valid live URL' }).optional().or(z.literal('')),
   technologies: z.array(z.string()).min(1, { message: 'Please add at least one technology' }),
   category: z.enum(['WEB', 'MOBILE', 'BACKEND', 'OTHER']),
@@ -75,6 +76,7 @@ export default function ProjectForm({ project }) {
       link: project?.link || '',
       image: project?.image || '',
       githubUrl: project?.githubUrl || '',
+      showGithub: project?.showGithub !== undefined ? project.showGithub : true,
       liveUrl: project?.liveUrl || '',
       technologies: project?.technologies || [],
       category: project?.category || 'WEB',
@@ -368,6 +370,28 @@ export default function ProjectForm({ project }) {
                         />
                       </FormControl>
                       <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="showGithub"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-slate-800 p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-slate-300">Show GitHub Link</FormLabel>
+                        <FormDescription className="text-slate-500 text-xs">
+                          Display GitHub link publicly on portfolio
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="data-[state=checked]:bg-blue-500 data-[state=checked]:text-white"
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />

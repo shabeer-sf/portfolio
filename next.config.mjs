@@ -9,9 +9,10 @@ const nextConfig = {
   images: {
     domains: [
       'images.pexels.com', // Pexels image domain
+      'images.unsplash.com', // Unsplash image domain
+      'unsplash.com', // Unsplash direct domain
     ],
   },
-  
+ 
 };
-
 export default nextConfig;
