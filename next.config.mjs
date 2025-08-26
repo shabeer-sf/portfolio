@@ -2,17 +2,30 @@
 const nextConfig = {
   webpack: (config, { isServer }) => {
     if (isServer) {
-      config.externals.push("ssh2");
+      config.externals.push("ssh2"); // prevent ssh2 from bundling on server
     }
     return config;
   },
   images: {
-    domains: [
-      'images.pexels.com', // Pexels image domain
-      'images.unsplash.com', // Unsplash image domain
-      'unsplash.com', // Unsplash direct domain
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com", // for your Cloudinary logo
+      }
     ],
   },
- 
 };
+
 export default nextConfig;
